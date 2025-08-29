@@ -1,60 +1,65 @@
-import os, json
+import os
+import json
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-# Load API Key
+# Load API key
 load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    raise ValueError("⚠️ No API key found in .env file")
-genai.configure(api_key=api_key)
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-MODEL = "gemini-1.5-flash"
+# Load evaluation dataset
+with open("evaluation_dataset.json", "r") as f:
+    dataset = json.load(f)["samples"]
 
-# Load dataset
-with open("eval_dataset.json", "r", encoding="utf-8") as f:
-    dataset = json.load(f)
+model = genai.GenerativeModel("gemini-1.5-flash")
 
-def run_eval():
-    model = genai.GenerativeModel(MODEL)
+# Judge prompt template
+JUDGE_PROMPT = """
+You are an evaluator. Compare the model's response with the expected output.
+Task: {task}
+Input: {input}
+Expected: {expected}
+Model Output: {output}
+
+Give a score between 0 and 1:
+- 1 if correct/very close
+- 0 if wrong
+- Between 0 and 1 if partially correct.
+Also explain briefly.
+"""
+
+def run_evaluation():
     results = []
-    correct = 0
+    for sample in dataset:
+        # Generate model response
+        response = model.generate_content(sample["input"])
+        output_text = response.text.strip()
 
-    for item in dataset:
-        prompt = item["prompt"]
-        expected = item.get("expected")
-
-        response = model.generate_content(
-            prompt,
-            generation_config={"temperature": 0.3, "max_output_tokens": 100}
+        # Judge evaluation
+        judge = model.generate_content(
+            JUDGE_PROMPT.format(
+                task=sample["task"],
+                input=sample["input"],
+                expected=sample["expected_output"],
+                output=output_text
+            ),
+            generation_config={"temperature": 0.0}
         )
 
-        output = response.text.strip()
-        result = {
-            "id": item["id"],
-            "task": item["task"],
-            "prompt": prompt,
-            "output": output,
-            "expected": expected
-        }
-
-        # simple scoring: exact match
-        if expected and output == expected:
-            result["score"] = 1
-            correct += 1
-        else:
-            result["score"] = 0
-
-        results.append(result)
-
-    # Final report
-    accuracy = correct / len(dataset)
-    print(f"\n✅ Evaluation complete! Accuracy: {accuracy:.2%}\n")
+        results.append({
+            "id": sample["id"],
+            "task": sample["task"],
+            "input": sample["input"],
+            "expected": sample["expected_output"],
+            "model_output": output_text,
+            "judge_score": judge.text
+        })
 
     # Save results
-    with open("eval_results.json", "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
+    with open("evaluation_results.json", "w") as f:
+        json.dump(results, f, indent=2)
+
+    print("✅ Evaluation complete! Results saved to evaluation_results.json")
 
 if __name__ == "__main__":
-    print("🔍 Running evaluation framework...\n")
-    run_eval()
+    run_evaluation()
