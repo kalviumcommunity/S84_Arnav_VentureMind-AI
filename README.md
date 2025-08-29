@@ -7,7 +7,7 @@ Turn raw startup ideas into structured, pitch‑ready plans using Retrieval‑Au
 VentureMind AI helps founders transform a one‑line startup idea into a complete, investor‑ready brief: problem & solution, market sizing, user personas, competitor landscape, go‑to‑market, monetization, risks, roadmap, and a crisp pitch. It blends:
 
 RAG over curated startup knowledge (frameworks, market benchmarks, competitor summaries, funding trends, pricing models, GTM playbooks).
-
+x
 Gemini LLM for fluent, context‑aware narratives and structured outputs.
 
 Dynamic prompting that adapts to user intent, maturity, and domain.
