@@ -1,0 +1,34 @@
+{
+  "samples": [
+    {
+      "id": 1,
+      "task": "math",
+      "input": "What is 12 multiplied by 8?",
+      "expected_output": "96"
+    },
+    {
+      "id": 2,
+      "task": "summarization",
+      "input": "Summarize this: Artificial Intelligence is transforming industries by automating tasks, enhancing decision-making, and creating new opportunities, but it also raises concerns about ethics and job displacement.",
+      "expected_output": "AI automates work, improves decisions, creates opportunities, but raises ethics and job concerns."
+    },
+    {
+      "id": 3,
+      "task": "classification",
+      "input": "Classify the sentiment: 'I love how smooth this app runs, it saves me so much time!'",
+      "expected_output": "Positive"
+    },
+    {
+      "id": 4,
+      "task": "reasoning",
+      "input": "If all cats are mammals and some mammals are pets, can we conclude that all cats are pets?",
+      "expected_output": "No, because not all mammals are pets."
+    },
+    {
+      "id": 5,
+      "task": "creative",
+      "input": "Suggest a unique startup idea in the education sector.",
+      "expected_output": "Example: A platform that matches retired professionals with students for mentorship and project-based learning."
+    }
+  ]
+}
